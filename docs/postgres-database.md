@@ -2,8 +2,7 @@
 
 When running on Dokku, we use a Postgres database supplied by Dokku.
 
-# Accessing Database Console
+Instructions for setting this up can be found here:
 
-* Use: <tt>`dokku postgres:connect <i>database-name</i></tt>
-* For example: `dokku postgres:connect team02-prod-db`
-* Cheatsheet of `psql` commands: <https://www.geeksforgeeks.org/postgresql-psql-commands/>
+* <https://ucsb-cs156.github.io/topics/dokku/postgres_database.html>
+

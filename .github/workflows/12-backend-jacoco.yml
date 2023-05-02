@@ -7,8 +7,14 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'pom.xml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'pom.xml'
 
 jobs:
   build:
@@ -26,4 +32,8 @@ jobs:
     - name: Build with Maven
       env:
         TEST_PROPERTIES: ${{ secrets.TEST_PROPERTIES }}
-      run: mvn -B test jacoco:report
+      run: mvn -B test jacoco:report 
+    - name: Upload to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: bash <(curl -s https://codecov.io/bash)
