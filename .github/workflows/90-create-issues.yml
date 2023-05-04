@@ -1,0 +1,89 @@
+# Create issues from files in the issues/ directory
+
+name: 90-create-issues
+on:
+  workflow_dispatch:
+  
+env:
+  GH_TOKEN: ${{ github.token }}
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "create-issues"
+  cancel-in-progress: false
+
+permissions: # see: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#permissions
+   contents: read
+   issues: write
+  
+jobs:
+  set-things-up:
+    runs-on: ubuntu-latest
+    outputs:
+      issue_filenames: ${{ steps.get-issue-filenames.outputs.issue_filenames }}
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Create Label 
+      run: |
+        gh label create "auto" -f -d "This issue was created from a script" -c 909090
+
+    - name: Get Issue Filenames
+      id: get-issue-filenames
+      run: |
+        cd issues
+        ls *.md > ../issue_filenames.tmp
+        cd ..
+        cat issue_filenames.tmp
+      
+        echo "[" > issue_filenames.json
+        while read line; do
+           echo \"$line\", >> issue_filenames.json
+        done <issue_filenames.tmp
+        echo "]" >> issue_filenames.json
+        # Next line removes all whitespace; see: https://www.baeldung.com/linux/remove-whitespace-from-file
+        s=`tr -d "[:space:]" < issue_filenames.json`
+        # Next line removes last trailing comma; see: https://unix.stackexchange.com/a/187920
+        issue_filenames=`echo ${s%,*}${s##*,}`
+        echo "issue_filenames=${issue_filenames}" 
+        echo "issue_filenames=${issue_filenames}" >> "$GITHUB_OUTPUT"
+   
+  create-issue:
+    name: Convert ${{ matrix.filename }} to issue
+    runs-on: ubuntu-latest
+    needs: [set-things-up]
+
+    strategy:
+      matrix:
+        # filename: [ issues/issue01.md ]
+        filename: ${{ fromJSON(needs.set-things-up.outputs.issue_filenames) }}
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+  
+    - name: Get title
+      run: |
+        title=`cat issues/${{ matrix.filename }} | head -n 1`
+        echo "title=${title}" >> "$GITHUB_ENV"
+
+    - name: Check if issue exists
+      id: check-if-issue-exists
+      continue-on-error: true # needed since grep may fail to find a match
+      run: |
+        open_issues=`gh issue list --state OPEN --json number,title`
+        echo $open_issues | grep '${{ env.title }}'
+      
+    - name: Create Issue From File
+      id: create-issue
+      uses: peter-evans/create-issue-from-file@v4.0.1
+      if: steps.check-if-issue-exists.outcome == 'failure' # meaning grep failed to find a duplicate, which is good!
+      with:
+        title: ${{ env.title }}
+        content-filepath: issues/${{ matrix.filename }}
+        labels: |
+          auto
+
