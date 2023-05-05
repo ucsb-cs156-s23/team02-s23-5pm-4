@@ -1,8 +1,8 @@
 package edu.ucsb.cs156.example.controllers;
 
-import edu.ucsb.cs156.example.entities.UCSBDate;
+import edu.ucsb.cs156.example.entities.Movie;
 import edu.ucsb.cs156.example.errors.EntityNotFoundException;
-import edu.ucsb.cs156.example.repositories.UCSBDateRepository;
+import edu.ucsb.cs156.example.repositories.MovieRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+// import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,88 +24,83 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import java.time.LocalDateTime;
-
-@Api(description = "UCSBDates")
-@RequestMapping("/api/ucsbdates")
+@Api(description = "Movies")
+@RequestMapping("/api/movies")
 @RestController
 @Slf4j
-public class UCSBDatesController extends ApiController {
+public class MoviesController extends ApiController {
 
     @Autowired
-    UCSBDateRepository ucsbDateRepository;
+    MovieRepository movieRepository;
 
-    @ApiOperation(value = "List all ucsb dates")
+    @ApiOperation(value = "List all movies")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/all")
-    public Iterable<UCSBDate> allUCSBDates() {
-        Iterable<UCSBDate> dates = ucsbDateRepository.findAll();
-        return dates;
+    public Iterable<Movie> allMovies() {
+        Iterable<Movie> names = movieRepository.findAll();
+        return names;
     }
 
-    @ApiOperation(value = "Get a single date")
+    @ApiOperation(value = "Get a single movie")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("")
-    public UCSBDate getById(
+    public Movie getById(
             @ApiParam("id") @RequestParam Long id) {
-        UCSBDate ucsbDate = ucsbDateRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UCSBDate.class, id));
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Movie.class, id));
 
-        return ucsbDate;
+        return movie;
     }
 
     @ApiOperation(value = "Create a new date")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
-    public UCSBDate postUCSBDate(
-            @ApiParam("quarterYYYYQ") @RequestParam String quarterYYYYQ,
+    public Movie postMovie(
             @ApiParam("name") @RequestParam String name,
-            @ApiParam("date (in iso format, e.g. YYYY-mm-ddTHH:MM:SS; see https://en.wikipedia.org/wiki/ISO_8601)") @RequestParam("localDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime localDateTime)
+            @ApiParam("genre") @RequestParam String genre,
+            @ApiParam("year") @RequestParam int year)
             throws JsonProcessingException {
 
-        // For an explanation of @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        // See: https://www.baeldung.com/spring-date-parameters
+        log.info("name={}", name);
 
-        log.info("localDateTime={}", localDateTime);
+        Movie movie = new Movie();
+        movie.setName(name);
+        movie.setGenre(genre);
+        movie.setYear(year);
 
-        UCSBDate ucsbDate = new UCSBDate();
-        ucsbDate.setQuarterYYYYQ(quarterYYYYQ);
-        ucsbDate.setName(name);
-        ucsbDate.setLocalDateTime(localDateTime);
+        Movie savedmovie = movieRepository.save(movie);
 
-        UCSBDate savedUcsbDate = ucsbDateRepository.save(ucsbDate);
-
-        return savedUcsbDate;
+        return savedmovie;
     }
 
-    @ApiOperation(value = "Delete a UCSBDate")
+    @ApiOperation(value = "Delete a movie")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("")
-    public Object deleteUCSBDate(
+    public Object deleteMovie(
             @ApiParam("id") @RequestParam Long id) {
-        UCSBDate ucsbDate = ucsbDateRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UCSBDate.class, id));
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Movie.class, id));
 
-        ucsbDateRepository.delete(ucsbDate);
-        return genericMessage("UCSBDate with id %s deleted".formatted(id));
+        movieRepository.delete(movie);
+        return genericMessage("Movie with id %s deleted".formatted(id));
     }
 
-    @ApiOperation(value = "Update a single date")
+    @ApiOperation(value = "Update a single movie")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("")
-    public UCSBDate updateUCSBDate(
+    public Movie updateMovie(
             @ApiParam("id") @RequestParam Long id,
-            @RequestBody @Valid UCSBDate incoming) {
+            @RequestBody @Valid Movie incoming) {
 
-        UCSBDate ucsbDate = ucsbDateRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UCSBDate.class, id));
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Movie.class, id));
 
-        ucsbDate.setQuarterYYYYQ(incoming.getQuarterYYYYQ());
-        ucsbDate.setName(incoming.getName());
-        ucsbDate.setLocalDateTime(incoming.getLocalDateTime());
+        movie.setName(incoming.getName());
+        movie.setGenre(incoming.getGenre());
+        movie.setYear(incoming.getYear());
 
-        ucsbDateRepository.save(ucsbDate);
+        movieRepository.save(movie);
 
-        return ucsbDate;
+        return movie;
     }
 }
