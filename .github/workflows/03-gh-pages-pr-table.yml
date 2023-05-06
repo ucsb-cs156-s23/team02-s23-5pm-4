@@ -86,25 +86,3 @@ jobs:
         folder: site # The folder the action should deploy.
         branch: gh-pages
         clean: false # Automatically remove deleted files from the deploy branch
-
-  build-jekyll-site:
-    name: Build Jekyll Site
-    needs: [build-basic-site]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: 'gh-pages'
-          fetch-depth: 1
-          token: ${{ github.token }}
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./
-          destination: ./_site
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-
