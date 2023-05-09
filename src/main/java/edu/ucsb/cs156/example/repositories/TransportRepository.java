@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface TransportRepository extends CrudRepository<Transport, Long> {
+public interface TransportRepository extends CrudRepository<Transport, String> {
   
 }
