@@ -22,7 +22,6 @@ function App() {
   const { data: currentUser } = useCurrentUser();
 
   return (
-    //<BrowserRouter basename="/team02-s23-5pm-4">
     <BrowserRouter>
       <Routes>
         <Route exact path="/" element={<HomePage />} />
