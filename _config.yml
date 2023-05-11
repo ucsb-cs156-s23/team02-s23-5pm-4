@@ -23,4 +23,4 @@ repo_name: "TBD"
 repo: ucsb-cs156-s23/team02-s23-5pm-4
 owner: ucsb-cs156-s23
 repo_name: team02-s23-5pm-4
-pull_requests: [{"author":{"id":"MDQ6VXNlcjI5NTg0ODU2","is_bot":false,"login":"strongani","name":"Anikait Mundhra"},"headRefName":"Anikait-bookController","number":56,"title":"Anikait book controller","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-4/pull/56"},{"author":{"id":"MDQ6VXNlcjEyNTM2MTg3","is_bot":false,"login":"ameymwalimbe","name":""},"headRefName":"amey-TreeController","number":55,"title":"amey - TreeController and all the other issues","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-4/pull/55"}]
+pull_requests: [{"author":{"id":"MDQ6VXNlcjEyNTM2MTg3","is_bot":false,"login":"ameymwalimbe","name":""},"headRefName":"amey-TreeController","number":55,"title":"amey - TreeController and all the other issues","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-4/pull/55"}]
