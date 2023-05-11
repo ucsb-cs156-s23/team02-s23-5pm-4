@@ -1,4 +1,4 @@
-Set up a team deployment for qa on Dokku
+Configure Github Pages
 
 # Acceptance Criteria:
 
