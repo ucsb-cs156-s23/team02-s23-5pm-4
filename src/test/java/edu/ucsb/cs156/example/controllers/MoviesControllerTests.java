@@ -97,7 +97,7 @@ public class MoviesControllerTests extends ControllerTestCase {
                 when(movieRepository.findById(eq(7L))).thenReturn(Optional.of(movie));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/movie?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/movies?id=7"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
