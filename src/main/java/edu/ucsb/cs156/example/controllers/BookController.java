@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import javax.validation.Valid;
 
 
@@ -59,6 +61,7 @@ public class BookController extends ApiController {
         @ApiParam("genre") @RequestParam String genre,
         @ApiParam("wordcount") @RequestParam Long wordcount
         )
+        throws JsonProcessingException
         {
 
         Book book = new Book();
