@@ -54,7 +54,6 @@ public class BookController extends ApiController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
     public Book postBook(
-        @ApiParam("id") @RequestParam Long id,
         @ApiParam("name") @RequestParam String name,
         @ApiParam("author") @RequestParam String author,
         @ApiParam("genre") @RequestParam String genre,
@@ -63,7 +62,6 @@ public class BookController extends ApiController {
         {
 
         Book book = new Book();
-        book.setId(id);
         book.setName(name);
         book.setAuthor(author);
         book.setGenre(genre);
@@ -86,7 +84,7 @@ public class BookController extends ApiController {
         return genericMessage("Book with id %s deleted".formatted(id));
     }
 
-    @ApiOperation(value = "Update a single id")
+    @ApiOperation(value = "Update a single book")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("")
     public Book updateBook(
@@ -96,8 +94,6 @@ public class BookController extends ApiController {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Book.class, id));
 
-
-        book.setId(incoming.getId());
         book.setName(incoming.getName());
         book.setAuthor(incoming.getAuthor());
         book.setGenre(incoming.getGenre());
