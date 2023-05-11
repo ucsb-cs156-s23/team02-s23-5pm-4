@@ -1,11 +1,18 @@
 # STARTER-team02
 
+```
+TODO: Adjust the link to the deployed production app 
+for your team here, then remove this TODO.
+```
 
+* Production: <https://team02-prod.dokku-xx.cs.ucsb.edu>
 
-* Production: <https://team02-prod.dokku-04.cs.ucsb.edu>
+```
+TODO: Adjust the link to the deployed qa app 
+for your team here, then remove this TODO.
+```
 
-
-* QA: <https://team02-qa.dokku-04.cs.ucsb.edu>
+* QA: <https://team02-qa.dokku-xx.cs.ucsb.edu>
 
 
 # Configuring GitHub Pages for the documentation
@@ -19,7 +26,19 @@ To set this up, follow the instructions here: [`docs/github-pages.md`](docs/gith
 # Getting Started on localhost
 
 Before running the application for the first time on localhost, you must: 
+# Configuring GitHub Pages for the documentation
 
+This repo contains Github Actions scripts that automatically create and publish documentation for the code:
+* javadoc for the backend Java code
+* Storybook for the frontend React code
+
+To set this up, follow the instructions here: [`docs/github-pages.md`](docs/github-pages.md)
+
+# Getting Started on localhost
+
+Before running the application for the first time on localhost, you must: 
+
+* Set up Google OAuth as documented in [`docs/oauth.md`](docs/oauth.md) 
 * Set up Google OAuth as documented in [`docs/oauth.md`](docs/oauth.md) 
 
 Otherwise, when you try to login for the first time, you 
@@ -27,6 +46,7 @@ will likely see an error such as:
 
 <img src="https://user-images.githubusercontent.com/1119017/149858436-c9baa238-a4f7-4c52-b995-0ed8bee97487.png" alt="Authorization Error; Error 401: invalid_client; The OAuth client was not found." width="400"/>
 
+Then:
 Then:
 
 * Open *two separate terminal windows*  
@@ -61,12 +81,39 @@ The `npm start` command may open up a web browser with the app running on port <
   ```
   
 ### What if it doesn't work?
+  
+  
+  ```
+
+The app should be available on <http://localhost:8080>
+
+### Note: <http://localhost:8080> not <http://localhost:3000> 
+
+The `npm start` command may open up a web browser with the app running on port <http://localhost:3000>.
+
+* You should *close this window* and work in one where you put in the url <http://localhost:8080>.  
+* The <http://localhost:3000> window has a frontend that is *not connected to the backend* and most
+  functions in that window will fail to work.
+* If you want to avoid this useless browser window opening up, <br />
+  instead of `npm start`, type this:
+
+  ```
+  BROWSER=none npm start
+  ```
+  
+### What if it doesn't work?
 
 If it doesn't work at first, e.g. you have a blank page on  <http://localhost:8080>, give it a minute and a few page refreshes.  Sometimes it takes a moment for everything to settle in.
 
 If you see the following on localhost, make sure that you also have the frontend code running in a separate window.
 
 ```
+Failed to connect to the frontend server... 
+
+On Dokku, be sure that PRODUCTION is defined. 
+
+On localhost, open a second terminal window, 
+cd into frontend and type: npm install; npm start";
 Failed to connect to the frontend server... 
 
 On Dokku, be sure that PRODUCTION is defined. 
@@ -81,9 +128,17 @@ cd into frontend and type: npm install; npm start";
 * Set up Google OAuth as documented in [`docs/oauth.md`](docs/oauth.md) 
 * Set up Postgres, as documented in  <https://ucsb-cs156.github.io/topics/dokku/postgres_database.html>
 * Set the config variable `PRODUCTION=true`
+* Follow the steps here: <https://ucsb-cs156.github.io/topics/dokku/getting_started.html>
+* Set up Google OAuth as documented in [`docs/oauth.md`](docs/oauth.md) 
+* Set up Postgres, as documented in  <https://ucsb-cs156.github.io/topics/dokku/postgres_database.html>
+* Set the config variable `PRODUCTION=true`
 
 # Accessing swagger
 
+Swagger is a tool that allows you to work directly with the RESTful API endpoints of the backend.
+It is similar to the tool Postman, but more convenient because it is built directly into the application.
+
+To access the Swagger API endpoints, use:
 Swagger is a tool that allows you to work directly with the RESTful API endpoints of the backend.
 It is similar to the tool Postman, but more convenient because it is built directly into the application.
 
@@ -92,14 +147,32 @@ To access the Swagger API endpoints, use:
 * <http://localhost:8080/swagger-ui/index.html>
 
 You can also append `/swagger-ui/index.html` to the URL manually when running on Dokku.
+You can also append `/swagger-ui/index.html` to the URL manually when running on Dokku.
 
+# To run React Storybook locally (for development)
 # To run React Storybook locally (for development)
 
 * cd into frontend
 * use: `npm run storybook`
+* use: `npm run storybook`
 * This should put the storybook on http://localhost:6006
 * Additional stories are added under frontend/src/stories
 
+You can also see the storybook for the main branch and all open pull requests on the 
+github pages site associated with the repo; see [/docs/github-pages.md](/docs/github-pages.md) for more info.
+
+* For documentation on React Storybook, see: <https://storybook.js.org/>
+
+# To generate javadoc (locally, for development)
+
+* cd to top level of repo
+* use: `mvn javadoc:javadoc`
+* open in a web browser: `target/site/apidocs/index.html`
+
+You can also see the javadoc for the main branch and all open pull requests on the 
+github pages site associated with the repo; see [/docs/github-pages.md](/docs/github-pages.md) for more info.
+
+* For documentation on Javadoc, see: <https://www.oracle.com/java/technologies/javase/javadoc-tool.html>
 You can also see the storybook for the main branch and all open pull requests on the 
 github pages site associated with the repo; see [/docs/github-pages.md](/docs/github-pages.md) for more info.
 
@@ -125,6 +198,9 @@ On localhost:
 * For more info, see [docs/h2-database.md](/docs/h2-database.md)
 
 On Dokku:
+* The SQL database is a postgres database provisioned automatically by Dokku
+* More info and instructions for accessing the SQL prompt are at [docs/postgres-database.md](/docs/postgres-database.md)
+
 * The SQL database is a postgres database provisioned automatically by Dokku
 * More info and instructions for accessing the SQL prompt are at [docs/postgres-database.md](/docs/postgres-database.md)
 
