@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,7 +58,7 @@ public class TransportControllerTests extends ControllerTestCase {
 
         @Test
         public void logged_out_users_cannot_get_by_id() throws Exception {
-                mockMvc.perform(get("/api/transport?name=Standard Kart"))
+                mockMvc.perform(get("/api/transport?id=7"))
                                 .andExpect(status().is(403)); // logged out users can't get by id
         }
 
@@ -77,7 +78,7 @@ public class TransportControllerTests extends ControllerTestCase {
                                 .andExpect(status().is(403)); // only admins can post
         }
 
-        // Tests with mocks for database actions
+        // // Tests with mocks for database actions
 
         @WithMockUser(roles = { "USER" })
         @Test
@@ -91,15 +92,15 @@ public class TransportControllerTests extends ControllerTestCase {
                                 .cost("1000")
                                 .build();
 
-                when(transportRepository.findById(eq("Standard Kart"))).thenReturn(Optional.of(transport));
+                when(transportRepository.findById(eq(7L))).thenReturn(Optional.of(transport));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/transport?name=Standard Kart"))
+                MvcResult response = mockMvc.perform(get("/api/transport?id=7"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
-                verify(transportRepository, times(1)).findById(eq("Standard Kart"));
+                verify(transportRepository, times(1)).findById(eq(7L));
                 String expectedJson = mapper.writeValueAsString(transport);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
@@ -111,42 +112,43 @@ public class TransportControllerTests extends ControllerTestCase {
 
                 // arrange
 
-                when(transportRepository.findById(eq("Standard Bike"))).thenReturn(Optional.empty());
+                when(transportRepository.findById(eq(7L))).thenReturn(Optional.empty());
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/transport?name=Standard Bike"))
+                MvcResult response = mockMvc.perform(get("/api/transport?id=7"))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
 
-                verify(transportRepository, times(1)).findById(eq("Standard Bike"));
+                verify(transportRepository, times(1)).findById(eq(7L));
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("EntityNotFoundException", json.get("type"));
-                assertEquals("Transport with id Standard Bike not found", json.get("message"));
+                assertEquals("Transport with id 7 not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
-        public void logged_in_user_can_get_all_transport() throws Exception {
+        public void logged_in_user_can_get_all_transports() throws Exception {
 
                 // arrange
 
-                Transport kart = Transport.builder()
+                Transport transport1 = Transport.builder()
                                 .name("Standard Kart")
                                 .mode("Kart")
                                 .cost("1000")
                                 .build();
 
-                Transport bike = Transport.builder()
-                                .name("Inkstriker")
-                                .mode("Kart")
-                                .cost("1000")
+
+                Transport transport2 = Transport.builder()
+                                .name("Standard Bike")
+                                .mode("Bike")
+                                .cost("100")
                                 .build();
 
-                ArrayList<Transport> expectedTransport = new ArrayList<>();
-                expectedTransport.addAll(Arrays.asList(kart, bike));
+                ArrayList<Transport> expectedTransports = new ArrayList<>();
+                expectedTransports.addAll(Arrays.asList(transport1, transport2));
 
-                when(transportRepository.findAll()).thenReturn(expectedTransport);
+                when(transportRepository.findAll()).thenReturn(expectedTransports);
 
                 // act
                 MvcResult response = mockMvc.perform(get("/api/transport/all"))
@@ -155,7 +157,7 @@ public class TransportControllerTests extends ControllerTestCase {
                 // assert
 
                 verify(transportRepository, times(1)).findAll();
-                String expectedJson = mapper.writeValueAsString(expectedTransport);
+                String expectedJson = mapper.writeValueAsString(expectedTransports);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -165,23 +167,24 @@ public class TransportControllerTests extends ControllerTestCase {
         public void an_admin_user_can_post_a_new_transport() throws Exception {
                 // arrange
 
-                Transport scooter = Transport.builder()
-                                .name("Lime")
-                                .mode("scooter")
-                                .cost("1.77")
+
+                Transport transport1 = Transport.builder()
+                                .name("Standard Kart")
+                                .mode("Kart")
+                                .cost("1000")
                                 .build();
 
-                when(transportRepository.save(eq(scooter))).thenReturn(scooter);
+                when(transportRepository.save(eq(transport1))).thenReturn(transport1);
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/transport/post?name=Lime&mode=scooter&cost=1.77")
+                                post("/api/transport/post?name=Standard Kart&mode=Kart&cost=1000")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(transportRepository, times(1)).save(scooter);
-                String expectedJson = mapper.writeValueAsString(scooter);
+                verify(transportRepository, times(1)).save(transport1);
+                String expectedJson = mapper.writeValueAsString(transport1);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -191,26 +194,27 @@ public class TransportControllerTests extends ControllerTestCase {
         public void admin_can_delete_a_date() throws Exception {
                 // arrange
 
-                Transport car = Transport.builder()
-                                .name("Car")
-                                .mode("car")
-                                .cost("11000")
+
+                Transport transport1 = Transport.builder()
+                                .name("Standard Kart")
+                                .mode("Kart")
+                                .cost("1000")
                                 .build();
 
-                when(transportRepository.findById(eq("Car"))).thenReturn(Optional.of(car));
+                when(transportRepository.findById(eq(15L))).thenReturn(Optional.of(transport1));
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/transport?name=Car")
+                                delete("/api/transport?id=15")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(transportRepository, times(1)).findById("Car");
+                verify(transportRepository, times(1)).findById(15L);
                 verify(transportRepository, times(1)).delete(any());
 
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("Transport with id Car deleted", json.get("message"));
+                assertEquals("Transport with id 15 deleted", json.get("message"));
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
@@ -219,18 +223,18 @@ public class TransportControllerTests extends ControllerTestCase {
                         throws Exception {
                 // arrange
 
-                when(transportRepository.findById(eq("Standard Bike"))).thenReturn(Optional.empty());
+                when(transportRepository.findById(eq(15L))).thenReturn(Optional.empty());
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/transport?name=Standard Bike")
+                                delete("/api/transport?id=15")
                                                 .with(csrf()))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
-                verify(transportRepository, times(1)).findById("Standard Bike");
+                verify(transportRepository, times(1)).findById(15L);
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("Transport with id Standard Bike not found", json.get("message"));
+                assertEquals("Transport with id 15 not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
@@ -238,25 +242,26 @@ public class TransportControllerTests extends ControllerTestCase {
         public void admin_can_edit_an_existing_transport() throws Exception {
                 // arrange
 
-                Transport KartOrig = Transport.builder()
+
+                Transport transportOrig = Transport.builder()
                                 .name("Standard Kart")
                                 .mode("Kart")
                                 .cost("1000")
                                 .build();
 
-                Transport KartEdited = Transport.builder()
-                                .name("Standard Kart")
-                                .mode("Kart")
-                                .cost("1")
+                Transport transportEdited = Transport.builder()
+                                .name("Inkstriker")
+                                .mode("Bike")
+                                .cost("10000")
                                 .build();
 
-                String requestBody = mapper.writeValueAsString(KartEdited);
+                String requestBody = mapper.writeValueAsString(transportEdited);
 
-                when(transportRepository.findById(eq("Standard Kart"))).thenReturn(Optional.of(KartOrig));
+                when(transportRepository.findById(eq(67L))).thenReturn(Optional.of(transportOrig));
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/transport?name=Standard Kart")
+                                put("/api/transport?id=67")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -264,8 +269,8 @@ public class TransportControllerTests extends ControllerTestCase {
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(transportRepository, times(1)).findById("Standard Kart");
-                verify(transportRepository, times(1)).save(KartEdited); // should be saved with updated info
+                verify(transportRepository, times(1)).findById(67L);
+                verify(transportRepository, times(1)).save(transportEdited); // should be saved with correct user
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(requestBody, responseString);
         }
@@ -275,19 +280,20 @@ public class TransportControllerTests extends ControllerTestCase {
         public void admin_cannot_edit_transport_that_does_not_exist() throws Exception {
                 // arrange
 
-                Transport editedBike = Transport.builder()
-                                .name("Standard Bike")
-                                .mode("Bike")
-                                .cost("10101")
+
+                Transport editedKart = Transport.builder()
+                                .name("Standard Kart")
+                                .mode("Kart")
+                                .cost("1000")
                                 .build();
 
-                String requestBody = mapper.writeValueAsString(editedBike);
+                String requestBody = mapper.writeValueAsString(editedKart);
 
-                when(transportRepository.findById(eq("Standard Bike"))).thenReturn(Optional.empty());
+                when(transportRepository.findById(eq(67L))).thenReturn(Optional.empty());
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/transport?name=Standard Bike")
+                                put("/api/transport?id=67")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -295,9 +301,9 @@ public class TransportControllerTests extends ControllerTestCase {
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
-                verify(transportRepository, times(1)).findById("Standard Bike");
+                verify(transportRepository, times(1)).findById(67L);
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("Transport with id Standard Bike not found", json.get("message"));
+                assertEquals("Transport with id 67 not found", json.get("message"));
 
         }
 }

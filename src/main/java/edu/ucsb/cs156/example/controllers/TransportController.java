@@ -43,9 +43,9 @@ public class TransportController extends ApiController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("")
     public Transport getById(
-            @ApiParam("name") @RequestParam String name) {
-        Transport transport = transportRepository.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException(Transport.class, name));
+            @ApiParam("id") @RequestParam Long id) {
+        Transport transport = transportRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Transport.class, id));
 
         return transport;
     }
@@ -74,23 +74,23 @@ public class TransportController extends ApiController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("")
     public Object deleteTransport(
-            @ApiParam("name") @RequestParam String name) {
-        Transport transport = transportRepository.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException(Transport.class, name));
+            @ApiParam("id") @RequestParam Long id) {
+        Transport transport = transportRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Transport.class, id));
 
         transportRepository.delete(transport);
-        return genericMessage("Transport with id %s deleted".formatted(name));
+        return genericMessage("Transport with id %s deleted".formatted(id));
     }
 
     @ApiOperation(value = "Update a single transport")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("")
     public Transport updateTransport(
-            @ApiParam("name") @RequestParam String name,
+            @ApiParam("id") @RequestParam Long id,
             @RequestBody @Valid Transport incoming) {
 
-        Transport transport = transportRepository.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException(Transport.class, name));
+        Transport transport = transportRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Transport.class, id));
 
 
         transport.setName(incoming.getName());  
